@@ -1,6 +1,6 @@
-﻿using ApiApp.Entities;
-using ApiApp.Models;
-using ApiApp.Services;
+﻿using Data.Entities;
+using Application.Models;
+using Application.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ApiApp.Controllers
@@ -12,28 +12,19 @@ namespace ApiApp.Controllers
         private readonly IAuthService _authService = authService;
 
         [HttpPost("signup")]
-        public async Task<IActionResult> SignUp([FromBody] SignUpModel model)
+        public async Task<IActionResult> SignUp(UserRequest request)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var user = new User
+            var result = await _authService.CreateUserAsync(request);
+            if (result.Success)
             {
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Email = model.Email,
-                PasswordHash = model.Password,
-                UserName = model.Email
-            };
-
-            var result = await _authService.CreateUserAsync(user);
-            if (result.Succeeded)
-            {
-                return Ok();
+                return Ok(result);
             }
-            return BadRequest(result.Errors);
+            return StatusCode(500, result.Error);
         }
 
         [HttpPost("signin")]
@@ -43,7 +34,7 @@ namespace ApiApp.Controllers
             {
                 return BadRequest(ModelState);
             }
-            var result = await _authService.SignIn(model);
+            var result = await _authService.SignInAsync(model);
             if (result.Succeeded)
             {
                 return Ok();

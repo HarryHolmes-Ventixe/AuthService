@@ -1,4 +1,4 @@
-﻿namespace ApiApp.Models;
+﻿namespace Application.Models;
 
 public class SignInModel
 {
