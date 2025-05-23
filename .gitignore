@@ -363,3 +363,8 @@ MigrationBackup/
 FodyWeavers.xsd
 /ApiApp/appsettings.json
 /ApiApp/appsettings.Development.json
+/Presentation/appsettings.json
+/Presentation/appsettings.Development.json
+/Data/Migrations/20250523112426_init.cs
+/Data/Migrations/DataContextModelSnapshot.cs
+/Data/Migrations/20250523112426_init.Designer.cs
