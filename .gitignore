@@ -368,3 +368,6 @@ FodyWeavers.xsd
 /Data/Migrations/20250523112426_init.cs
 /Data/Migrations/DataContextModelSnapshot.cs
 /Data/Migrations/20250523112426_init.Designer.cs
+/TextFile2.txt
+/Data/Migrations/20250524061336_azure-init.cs
+/Data/Migrations/20250524061336_azure-init.Designer.cs
