@@ -65,12 +65,12 @@ public class AuthService(SignInManager<UserEntity> signInManager, UserManager<Us
         };
     }
 
-    public async Task<UserResult<User?>> GetUserAsync(string eventId)
+    public async Task<UserResult<User?>> GetUserAsync(string email)
     {
-        var result = await _authRepository.GetAsync(x => x.Id == eventId);
+        var result = await _authRepository.GetAsync(x => x.Email.ToUpper() == email.ToUpper());
         if (result.Success && result.Result != null)
         {
-            var currentEvent = new User
+            var user = new User
             {
                 Id = result.Result.Id,
                 FirstName = result.Result.FirstName,
@@ -81,13 +81,13 @@ public class AuthService(SignInManager<UserEntity> signInManager, UserManager<Us
             return new UserResult<User?>
             {
                 Success = true,
-                Result = currentEvent
+                Result = user
             };
         }
         return new UserResult<User?>
         {
             Success = false,
-            Error = "Event not found"
+            Error = "User not found"
         };
 
     }

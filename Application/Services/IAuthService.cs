@@ -7,7 +7,7 @@ namespace Application.Services
     {
         Task<UserResult> CreateUserAsync(UserRequest request);
         Task<UserResult<IEnumerable<User>>> GetAllUsersAsync();
-        Task<UserResult<User?>> GetUserAsync(string eventId);
+        Task<UserResult<User?>> GetUserAsync(string email);
         Task<SignInResult> SignInAsync(SignInModel model);
         Task SignOutAsync();
     }
