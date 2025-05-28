@@ -2,14 +2,20 @@
 using Application.Models;
 using Data.Repositories;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace Application.Services;
 
-public class AuthService(SignInManager<UserEntity> signInManager, UserManager<UserEntity> userManager, IAuthRepository authRepository) : IAuthService
+public class AuthService(SignInManager<UserEntity> signInManager, UserManager<UserEntity> userManager, IAuthRepository authRepository, IConfiguration configuration) : IAuthService
 {
     private readonly UserManager<UserEntity> _userManager = userManager;
     private readonly SignInManager<UserEntity> _signInManager = signInManager;
     private readonly IAuthRepository _authRepository = authRepository;
+    private readonly IConfiguration _configuration = configuration;
 
     #region CRUD
 
@@ -110,6 +116,39 @@ public class AuthService(SignInManager<UserEntity> signInManager, UserManager<Us
     {
         await _signInManager.SignOutAsync();
     }
+
+    public string GenerateJwtToken(UserEntity user)
+    {
+        var jwtSection = _configuration.GetSection("Jwt");
+        var key = jwtSection.GetValue<string>("Key");
+        var issuers = jwtSection.GetSection("Issuer").Get<string[]>();
+        var audiences = jwtSection.GetSection("Audience").Get<string[]>();
+
+        var claims = new List<Claim>
+        {
+            new(JwtRegisteredClaimNames.Sub, user.Id),
+            new(JwtRegisteredClaimNames.Email, user.Email ?? string.Empty),
+            new("firstName", user.FirstName ?? string.Empty),
+            new("lastName", user.LastName ?? string.Empty)
+        };
+
+        var keyBytes = Encoding.UTF8.GetBytes(key);
+        var signingKey = new SymmetricSecurityKey(keyBytes);
+
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(claims),
+            Expires = DateTime.UtcNow.AddHours(1),
+            Issuer = issuers?.FirstOrDefault(),
+            Audience = audiences?.FirstOrDefault(),
+            SigningCredentials = new SigningCredentials(signingKey, SecurityAlgorithms.HmacSha256Signature)
+        };
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        return tokenHandler.WriteToken(token);
+    }
+
 
     #endregion
 }

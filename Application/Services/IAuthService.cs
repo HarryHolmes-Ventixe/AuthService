@@ -1,4 +1,5 @@
 ﻿using Application.Models;
+using Data.Entities;
 using Microsoft.AspNetCore.Identity;
 
 namespace Application.Services
@@ -10,5 +11,6 @@ namespace Application.Services
         Task<UserResult<User?>> GetUserAsync(string email);
         Task<SignInResult> SignInAsync(SignInModel model);
         Task SignOutAsync();
+        string GenerateJwtToken(UserEntity user);
     }
 }
