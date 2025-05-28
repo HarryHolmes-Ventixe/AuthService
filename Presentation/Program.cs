@@ -58,6 +58,19 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173",
+                           "https://happy-beach-049511503.6.azurestaticapps.net")
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
+
+
 var app = builder.Build();
 
 app.MapOpenApi();
@@ -73,14 +86,7 @@ app.UseHttpsRedirection();
 
 
 //Github copilot suggested these changes here and in the Azure Web App so that I could use "AllowCredentials".
-app.UseCors(builder =>
-{
-    builder.WithOrigins("http://localhost:5173",
-        "https://happy-beach-049511503.6.azurestaticapps.net")
-        .AllowAnyMethod()
-        .AllowAnyHeader()
-        .AllowCredentials();
-});
+app.UseCors("AllowFrontend");
 
 app.UseAuthentication();
 app.UseAuthorization();

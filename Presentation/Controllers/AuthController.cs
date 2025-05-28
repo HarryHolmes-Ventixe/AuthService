@@ -94,12 +94,11 @@ namespace ApiApp.Controllers
                     Response.Cookies.Append("jwt", tokenString, new CookieOptions
                     {
                         HttpOnly = true,
-                        //Secure = Request.IsHttps,
-                        Secure = false,
+                        Secure = true,
                         SameSite = SameSiteMode.None,
                         Expires = DateTimeOffset.UtcNow.AddMinutes(60)
                     });
-                    return Ok();
+                    return Ok(new {token = tokenString, user });
                 }
                 return Unauthorized();
             }
