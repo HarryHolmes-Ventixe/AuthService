@@ -72,5 +72,35 @@ namespace ApiApp.Controllers
             await _authService.SignOutAsync();
             return Ok();
         }
+
+        [HttpPost("confirm-email")]
+        public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.Email))
+            {
+                return BadRequest(new { Error = "Email is required." });
+            }
+
+            var user = await _userManager.FindByEmailAsync(request.Email);
+            if (user == null)
+            {
+                return NotFound(new { Error = "User not found." });
+            }
+
+            if (user.EmailConfirmed)
+            {
+                return BadRequest(new { Error = "Email is already confirmed." });
+            }
+
+            user.EmailConfirmed = true;
+            var result = await _userManager.UpdateAsync(user);
+
+            if (result.Succeeded)
+            {
+                return Ok(new { Message = "Email confirmed successfully." });
+            }
+            return StatusCode(500, new { Error = "Failed to confirm email." });
+        }
+
     }
 }
